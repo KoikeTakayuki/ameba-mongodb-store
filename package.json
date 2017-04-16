@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/KoikeTakayuki/ameba-mongodb-store#readme",
   "dependencies": {
-    "ameba-core": "https://github.com/KoikeTakayuki/ameba-core.git"
+    "ameba-core": "https://github.com/KoikeTakayuki/ameba-core.git",
+    "mongodb":"^2.2.25"
   },
   "devDependencies": {
     "mocha": "^3.2.0"
