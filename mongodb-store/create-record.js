@@ -1,40 +1,10 @@
 const util = require('ameba-util');
 const typeField = require('ameba-core').Fields.type;
 const save = require('./save-record');
+const attachTypePredicates = require('./attach-type-predicates');
 
 const getHierarchyFields = util.getHierarchyFields;
 const getRootType = util.getRootType;
-
-function getTypePredicateName(type) {
-  const typeId = type.id.substring(type.id.lastIndexOf('.') + 1);
-  const predicateName = `is${typeId}`;
-
-  return predicateName;
-}
-
-function attachTypePredicates(insertRecord, type) {
-  const rootType = getRootType(type);
-
-  if (type.id === rootType.id) {
-    return insertRecord;
-  }
-
-  const result = {};
-
-  let baseType = type.baseType;
-  let predicateName = getTypePredicateName(type);
-
-  Object.assign(result, insertRecord);
-  result[predicateName] = true;
-
-  while (baseType.id !== rootType.id) {
-    predicateName = getTypePredicateName(type);
-    result[predicateName] = true;
-    baseType = baseType.baseType;
-  }
-
-  return result;
-}
 
 module.exports = (connection) => {
   function getInsertRecord(record) {
