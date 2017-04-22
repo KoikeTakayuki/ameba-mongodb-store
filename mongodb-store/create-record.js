@@ -57,7 +57,7 @@ module.exports = (connection) => {
 
       return acc.then((data) => {
         const fieldValue = record[f.id];
-        const fieldType = f.fieldType;
+        const fieldType = f.id === 'defaultValue' ? record.fieldType : f.fieldType;
         let promise;
 
         if (f.isListField) {
@@ -83,24 +83,22 @@ module.exports = (connection) => {
     const rootType = getRootType(record.type);
     const rootTypeId = rootType.id;
 
-
-    return connection.then(db => db.collection(rootTypeId))
-      .then(collection =>
-        getInsertRecord(record)
-          .then(insertRecord =>
-            new Promise((success, failure) => {
-              collection.insert(insertRecord, (e, results) => {
-                if (e) {
-                  failure(e);
-                } else {
-                  const referenceId = results.insertedIds[0];
-                  const result = {};
-                  result._id = referenceId;
-                  Object.assign(result, insertRecord);
-                  success(result);
-                }
-              });
-            })));
+    return connection
+      .then(db => db.collection(rootTypeId))
+      .then(collection => getInsertRecord(record)
+        .then(insertRecord => new Promise((success, failure) => {
+          collection.insert(insertRecord, (e, results) => {
+            if (e) {
+              failure(e);
+            } else {
+              const referenceId = results.insertedIds[0];
+              const result = {};
+              result._id = referenceId;
+              Object.assign(result, insertRecord);
+              success(result);
+            }
+          });
+        })));
   }
 
   return createRecord;
