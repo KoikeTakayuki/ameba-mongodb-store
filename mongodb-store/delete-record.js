@@ -17,7 +17,7 @@ module.exports = (connection) => {
           if (e) {
             failure(e);
           } else {
-            success(true);
+            success();
           }
         });
       }));
