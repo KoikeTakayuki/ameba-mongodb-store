@@ -1,11 +1,13 @@
-let readRecord;
-let saveRecord;
+let create;
+let read;
+let update;
 let deleteRecord;
 
 function createStore(connection) {
   return {
-    read: readRecord(connection),
-    save: saveRecord(connection),
+    create: create(connection),
+    read: read(connection),
+    update: update(connection),
     delete: deleteRecord(connection),
     close: () => connection.then(db => db.close()),
   };
@@ -13,6 +15,7 @@ function createStore(connection) {
 
 module.exports = createStore;
 
-readRecord = require('./read-record');
-saveRecord = require('./save-record');
-deleteRecord = require('./delete-record');
+create = require('./create');
+read = require('./read');
+update = require('./update');
+deleteRecord = require('./delete');

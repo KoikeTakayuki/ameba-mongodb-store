@@ -1,21 +1,26 @@
 const util = require('ameba-util');
 const typeField = require('ameba-core').Fields.type;
-const save = require('./save-record');
 const attachTypePredicates = require('./attach-type-predicates');
 
 const getHierarchyFields = util.getHierarchyFields;
 const getRootType = util.getRootType;
 
-module.exports = (connection) => {
+function create(connection) {
   function getInsertRecord(record) {
     function getInsertFieldValue(fieldValue, fieldType) {
       if (fieldValue === null || fieldValue === undefined || fieldType.isPrimitiveType) {
         return Promise.resolve(fieldValue);
-      } else if (fieldType.isInnerType) {
+      }
+
+      if (fieldType.isInnerType) {
         return getInsertRecord(fieldValue);
       }
 
-      return save(connection)(fieldValue).then(r => r._id);
+      if (fieldValue._id) {
+        return Promise.resolve(fieldValue._id);
+      }
+
+      return create(connection)(fieldValue).then(r => r._id);
     }
 
     const fields = getHierarchyFields(record.type);
@@ -72,4 +77,6 @@ module.exports = (connection) => {
   }
 
   return createRecord;
-};
+}
+
+module.exports = create;

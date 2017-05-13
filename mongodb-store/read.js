@@ -3,7 +3,9 @@ const attachTypePredicates = require('./attach-type-predicates');
 
 const getRootType = util.getRootType;
 const getHierarchyFields = util.getHierarchyFields;
+const filterByFields = require('./filter-by-fields');
 
+// for mongodb read field
 function getReadFieldIds(recordType) {
   const fields = getHierarchyFields(recordType);
   const readFieldIds = { _id: 1 };
@@ -16,15 +18,15 @@ function getReadFieldIds(recordType) {
 }
 
 module.exports = (connection) => {
-  function readRecord(recordType, condition, optionalArguments) {
-    const collectionName = getRootType(recordType).id;
-
+  function read(recordType, condition, optionalArguments) {
     return connection
-      .then(db => db.collection(collectionName))
-      .then(collection => new Promise((success, failure) => {
+      .then(db => new Promise((success, failure) => {
+        const collectionName = getRootType(recordType).id;
+        const collection = db.collection(collectionName);
         const readFieldIds = getReadFieldIds(recordType);
+        const readCondition = filterByFields(condition, recordType);
 
-        let result = collection.find(attachTypePredicates(condition, recordType), readFieldIds);
+        let result = collection.find(attachTypePredicates(readCondition, recordType), readFieldIds);
         const promiseCallback = (e, docs) => {
           if (e) {
             failure(e);
@@ -49,5 +51,5 @@ module.exports = (connection) => {
       }));
   }
 
-  return readRecord;
+  return read;
 };
