@@ -1,11 +1,11 @@
-let create;
+let save;
 let read;
 let update;
 let deleteRecord;
 
 function createStore(connection) {
   return {
-    create: create(connection),
+    save: save(connection),
     read: read(connection),
     update: update(connection),
     delete: deleteRecord(connection),
@@ -15,7 +15,7 @@ function createStore(connection) {
 
 module.exports = createStore;
 
-create = require('./create');
+save = require('./save');
 read = require('./read');
 update = require('./update');
 deleteRecord = require('./delete');

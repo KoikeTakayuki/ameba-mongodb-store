@@ -5,7 +5,7 @@ const attachTypePredicates = require('./attach-type-predicates');
 const getHierarchyFields = util.getHierarchyFields;
 const getRootType = util.getRootType;
 
-function create(connection) {
+function save(connection) {
   function getInsertRecord(record) {
     function getInsertFieldValue(fieldValue, fieldType) {
       if (fieldValue === null || fieldValue === undefined || fieldType.isPrimitiveType) {
@@ -54,7 +54,7 @@ function create(connection) {
     }, Promise.resolve({})).then(insertRecord => attachTypePredicates(insertRecord, record.type));
   }
 
-  function createRecord(record) {
+  function saveRecord(record) {
     const rootType = getRootType(record.type);
     const rootTypeId = rootType.id;
 
@@ -76,7 +76,7 @@ function create(connection) {
         })));
   }
 
-  return createRecord;
+  return saveRecord;
 }
 
-module.exports = create;
+module.exports = save;
