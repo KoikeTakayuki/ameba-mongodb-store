@@ -40,11 +40,11 @@ module.exports = (connection) => {
         }
 
         if (optionalArguments && optionalArguments.limit) {
-          result = result.limit(optionalArguments.limit);
+          result = result.limit(parseInt(optionalArguments.limit));
         }
 
         if (optionalArguments && optionalArguments.skip) {
-          result = result.skip(optionalArguments.skip);
+          result = result.skip(parseInt(optionalArguments.skip));
         }
 
         return result.toArray(promiseCallback);
