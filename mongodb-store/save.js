@@ -20,7 +20,7 @@ function save(connection) {
         return Promise.resolve(fieldValue._id);
       }
 
-      return create(connection)(fieldValue).then(r => r._id);
+      return save(connection)(fieldValue).then(r => r._id);
     }
 
     const fields = getHierarchyFields(record.type);
