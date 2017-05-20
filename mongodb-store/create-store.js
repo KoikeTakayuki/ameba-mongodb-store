@@ -2,6 +2,7 @@ let save;
 let read;
 let update;
 let deleteRecord;
+let count;
 
 function createStore(connection) {
   return {
@@ -9,6 +10,7 @@ function createStore(connection) {
     read: read(connection),
     update: update(connection),
     delete: deleteRecord(connection),
+    count: count(connection),
     close: () => connection.then(db => db.close()),
   };
 }
@@ -19,3 +21,4 @@ save = require('./save');
 read = require('./read');
 update = require('./update');
 deleteRecord = require('./delete');
+count = require('./count');

@@ -27,27 +27,22 @@ module.exports = (connection) => {
         const readCondition = filterByFields(condition, recordType);
 
         let result = collection.find(attachTypePredicates(readCondition, recordType), readFieldIds);
-        const promiseCallback = (e, docs) => {
+
+        if (optionalArguments && optionalArguments.limit) {
+          result = result.limit(parseInt(optionalArguments.limit, 10));
+        }
+
+        if (optionalArguments && optionalArguments.skip) {
+          result = result.skip(parseInt(optionalArguments.skip, 10));
+        }
+
+        return result.toArray((e, docs) => {
           if (e) {
             failure(e);
           } else {
             success(docs);
           }
-        };
-
-        if (optionalArguments && optionalArguments.count) {
-          return result.count(promiseCallback);
-        }
-
-        if (optionalArguments && optionalArguments.limit) {
-          result = result.limit(parseInt(optionalArguments.limit));
-        }
-
-        if (optionalArguments && optionalArguments.skip) {
-          result = result.skip(parseInt(optionalArguments.skip));
-        }
-
-        return result.toArray(promiseCallback);
+        });
       }));
   }
 
