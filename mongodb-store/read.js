@@ -36,6 +36,10 @@ module.exports = (connection) => {
           result = result.skip(parseInt(optionalArguments.skip, 10));
         }
 
+        if (optionalArguments && optionalArguments.sort) {
+          result = result.sort(optionalArguments.sort);
+        }
+
         return result.toArray((e, docs) => {
           if (e) {
             failure(e);
