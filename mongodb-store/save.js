@@ -1,5 +1,8 @@
 const util = require('ameba-util');
-const typeField = require('ameba-core').Fields.type;
+const Core = require('ameba-core');
+
+const typeField = Core.Fields.type;
+const DateType = Core.Types.DateType;
 const attachTypePredicates = require('./attach-type-predicates');
 
 const getHierarchyFields = util.getHierarchyFields;
@@ -8,6 +11,10 @@ const getRootType = util.getRootType;
 function save(connection) {
   function getInsertRecord(recordType, record) {
     function getInsertFieldValue(fieldValue, fieldType) {
+      if (fieldType.id === DateType.id && !(fieldValue instanceof Date)) {
+        return Promise.resolve(new Date(fieldValue));
+      }
+
       if (fieldValue === null || fieldValue === undefined || fieldType.isPrimitiveType) {
         return Promise.resolve(fieldValue);
       }
