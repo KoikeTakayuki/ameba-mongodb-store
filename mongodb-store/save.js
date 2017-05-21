@@ -6,14 +6,14 @@ const getHierarchyFields = util.getHierarchyFields;
 const getRootType = util.getRootType;
 
 function save(connection) {
-  function getInsertRecord(record) {
+  function getInsertRecord(recordType, record) {
     function getInsertFieldValue(fieldValue, fieldType) {
       if (fieldValue === null || fieldValue === undefined || fieldType.isPrimitiveType) {
         return Promise.resolve(fieldValue);
       }
 
       if (fieldType.isInnerType) {
-        return getInsertRecord(fieldValue);
+        return getInsertRecord(recordType, fieldValue);
       }
 
       if (fieldValue._id) {
@@ -23,7 +23,7 @@ function save(connection) {
       return save(connection)(fieldValue).then(r => r._id);
     }
 
-    const fields = getHierarchyFields(record.type);
+    const fields = getHierarchyFields(recordType);
 
     return fields.reduce((acc, f) => {
       if (f.id === typeField.id) {
@@ -51,16 +51,16 @@ function save(connection) {
           return result;
         });
       });
-    }, Promise.resolve({})).then(insertRecord => attachTypePredicates(insertRecord, record.type));
+    }, Promise.resolve({})).then(insertRecord => attachTypePredicates(insertRecord, recordType));
   }
 
-  function saveRecord(record) {
-    const rootType = getRootType(record.type);
+  function saveRecord(recordType, record) {
+    const rootType = getRootType(recordType);
     const rootTypeId = rootType.id;
 
     return connection
       .then(db => db.collection(rootTypeId))
-      .then(collection => getInsertRecord(record)
+      .then(collection => getInsertRecord(recordType, record)
         .then(insertRecord => new Promise((success, failure) => {
           collection.insert(insertRecord, (e, results) => {
             if (e) {
