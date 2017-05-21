@@ -37,7 +37,11 @@ module.exports = (connection) => {
         }
 
         if (optionalArguments && optionalArguments.sort) {
-          result = result.sort(optionalArguments.sort);
+          const sortParams = {};
+          Object.keys(optionalArguments.sort).forEach((key) => {
+            sortParams[key] = parseInt(optionalArguments.sort[key], 10);
+          });
+          result = result.sort(sortParams);
         }
 
         return result.toArray((e, docs) => {
