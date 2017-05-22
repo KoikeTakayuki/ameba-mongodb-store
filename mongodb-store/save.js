@@ -1,29 +1,36 @@
 const util = require('ameba-util');
-const typeField = require('ameba-core').Fields.type;
+const Core = require('ameba-core');
+
+const typeField = Core.Fields.type;
+const DateType = Core.Types.DateType;
 const attachTypePredicates = require('./attach-type-predicates');
 
 const getHierarchyFields = util.getHierarchyFields;
 const getRootType = util.getRootType;
 
-function create(connection) {
-  function getInsertRecord(record) {
+function save(connection) {
+  function getInsertRecord(recordType, record) {
     function getInsertFieldValue(fieldValue, fieldType) {
+      if (fieldType.id === DateType.id && !(fieldValue instanceof Date)) {
+        return Promise.resolve(new Date(fieldValue));
+      }
+
       if (fieldValue === null || fieldValue === undefined || fieldType.isPrimitiveType) {
         return Promise.resolve(fieldValue);
       }
 
       if (fieldType.isInnerType) {
-        return getInsertRecord(fieldValue);
+        return getInsertRecord(recordType, fieldValue);
       }
 
       if (fieldValue._id) {
         return Promise.resolve(fieldValue._id);
       }
 
-      return create(connection)(fieldValue).then(r => r._id);
+      return save(connection)(fieldValue).then(r => r._id);
     }
 
-    const fields = getHierarchyFields(record.type);
+    const fields = getHierarchyFields(recordType);
 
     return fields.reduce((acc, f) => {
       if (f.id === typeField.id) {
@@ -51,16 +58,16 @@ function create(connection) {
           return result;
         });
       });
-    }, Promise.resolve({})).then(insertRecord => attachTypePredicates(insertRecord, record.type));
+    }, Promise.resolve({})).then(insertRecord => attachTypePredicates(insertRecord, recordType));
   }
 
-  function createRecord(record) {
-    const rootType = getRootType(record.type);
+  function saveRecord(recordType, record) {
+    const rootType = getRootType(recordType);
     const rootTypeId = rootType.id;
 
     return connection
       .then(db => db.collection(rootTypeId))
-      .then(collection => getInsertRecord(record)
+      .then(collection => getInsertRecord(recordType, record)
         .then(insertRecord => new Promise((success, failure) => {
           collection.insert(insertRecord, (e, results) => {
             if (e) {
@@ -76,7 +83,7 @@ function create(connection) {
         })));
   }
 
-  return createRecord;
+  return saveRecord;
 }
 
-module.exports = create;
+module.exports = save;
