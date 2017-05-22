@@ -1,4 +1,5 @@
 const getHierarchyFields = require('ameba-util').getHierarchyFields;
+const ObjectId = require('mongodb').ObjectID;
 
 function filterByFields(values, recordType) {
   if (!values) {
@@ -13,6 +14,10 @@ function filterByFields(values, recordType) {
       result[key] = values[key];
     }
   });
+
+  if (values._id) {
+    result._id = new ObjectID(values._id);
+  }
 
   return result;
 }
