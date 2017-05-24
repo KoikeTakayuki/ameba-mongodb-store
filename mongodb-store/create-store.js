@@ -3,6 +3,7 @@ let read;
 let update;
 let deleteRecord;
 let count;
+let aggregate;
 
 function createStore(connection) {
   return {
@@ -11,6 +12,7 @@ function createStore(connection) {
     update: update(connection),
     delete: deleteRecord(connection),
     count: count(connection),
+    aggregate: aggregate(connection),
     close: () => connection.then(db => db.close()),
   };
 }
@@ -22,3 +24,4 @@ read = require('./read');
 update = require('./update');
 deleteRecord = require('./delete');
 count = require('./count');
+aggregate = require('./aggregate');
