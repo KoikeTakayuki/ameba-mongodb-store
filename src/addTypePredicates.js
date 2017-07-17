@@ -1,17 +1,15 @@
-const getRootType = require('ameba-util').getRootType;
+const getRootType = require('ameba-core').util.getRootType;
 
 function getTypePredicateName(recordType) {
   const typeId = recordType.id.substring(recordType.id.lastIndexOf('.') + 1);
-  const predicateName = `is${typeId}`;
-
-  return predicateName;
+  return `is${typeId}`;
 }
 
-function attachTypePredicates(record, recordType) {
+function attachTypePredicates(target, recordType) {
   const rootType = getRootType(recordType);
 
   if (recordType.id === rootType.id) {
-    return record;
+    return target;
   }
 
   const result = {};
@@ -19,7 +17,7 @@ function attachTypePredicates(record, recordType) {
   let baseType = recordType.baseType;
   let predicateName = getTypePredicateName(recordType);
 
-  Object.assign(result, record);
+  Object.assign(result, target);
   result[predicateName] = true;
 
   while (baseType.id !== rootType.id) {
