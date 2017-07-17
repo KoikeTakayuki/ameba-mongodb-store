@@ -1,6 +1,6 @@
 {
   "name": "ameba-mongodb-store",
-  "version": "0.9.7",
+  "version": "0.9.8",
   "description": "ameba mongodb store implementation",
   "main": "index.js",
   "scripts": {
